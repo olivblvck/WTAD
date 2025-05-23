@@ -20,3 +20,24 @@ def load_and_clean_dataset(path, target_column=None):
     X = StandardScaler().fit_transform(X)
 
     return X, y
+
+import numpy as np
+
+def load_mnist_npz(path="datasets/mnist.npz", sample_size=5000):
+    """
+    Ładuje dane z MNIST w formacie .npz, zwraca X i y.
+    Przycinamy do sample_size dla przyspieszenia PCA/k-means.
+    """
+    data = np.load(path)
+    X = data["x_train"].reshape(-1, 28 * 28)  # Spłaszczenie obrazków 28x28
+    y = data["y_train"]
+
+    # Losowa próbka (bo MNIST ma 60 000 przykładów)
+    indices = np.random.choice(len(X), size=sample_size, replace=False)
+    X_sample = X[indices]
+    y_sample = y[indices]
+
+    # Skalowanie wartości pikseli (0–255) do 0–1
+    X_sample = X_sample / 255.0
+
+    return X_sample, y_sample
